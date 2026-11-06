@@ -1,0 +1,26 @@
+name: Deploy to Lightsail qqbot-1
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'Anon2Tokyo'
+    steps:
+      - name: Deploy AstrBot via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/ubuntu/astrbot
+            git fetch origin master
+            git reset --hard origin/master
+            /home/ubuntu/.local/bin/uv sync
+            sudo systemctl restart astrbot
